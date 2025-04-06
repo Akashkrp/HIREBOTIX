@@ -7,6 +7,8 @@ package-lock.json
 .pnpm-debug.log*
 
 # Environment variables
+config/config.env
+
 .env
 .env.local
 .env.development
