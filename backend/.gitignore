@@ -1,0 +1,80 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+debug.log
+.log
+
+# Build artifacts
+dist/
+build/
+.cache/
+.next/
+out/
+.vite/
+
+# Database
+*.sqlite
+*.sqlite-journal
+mongodb/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing & coverage
+coverage/
+jest/
+.nyc_output/
+cypress/videos/
+cypress/screenshots/
+
+# Binaries
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Git
+.git/
+.gitattributes
+
+# Linting
+.eslintcache
+.stylelintcache
+
+# Deployment
+vercel/
+.netlify/
+firebase.json
+
+# Docker
+docker-compose.override.yml
+.dockerignore
