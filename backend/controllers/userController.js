@@ -2,8 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/error.js";
 import { User } from "../models/userSchema.js";
 import { v2 as cloudinary } from "cloudinary";
-import {sendToken} from "../utils/jwtToken.js";
-import { Error } from "mongoose";
+import { sendToken } from "../utils/jwtToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -21,30 +20,17 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     } = req.body;
 
     if (!name || !email || !phone || !address || !password || !role) {
-      return next(new ErrorHandler("All fields are required", 400));
+      return next(new ErrorHandler("All fileds are required.", 400));
     }
-
-    if (!firstNiche || !secondNiche || !thirdNiche) {
+    if (role === "Job Seeker" && (!firstNiche || !secondNiche || !thirdNiche)) {
       return next(
-        new ErrorHandler("Please provide your preferred job niches", 400)
+        new ErrorHandler("Please provide your preferred job niches.", 400)
       );
     }
-
-    if (role !== "job seeker" && role !== "employer") {
-      return next(
-        new ErrorHandler(
-          "Invalid role. Role must be either 'job seeker' or 'employer'",
-          400
-        )
-      );
-    }
-
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
-      return next(new ErrorHandler("Email is already registered", 400));
+      return next(new ErrorHandler("Email is already registered.", 400));
     }
-
     const userData = {
       name,
       email,
@@ -59,60 +45,55 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       },
       coverLetter,
     };
-
     if (req.files && req.files.resume) {
-        const { resume } = req.files;
-        if (resume) {
-          try {
-            const cloudinaryResponse = await cloudinary.uploader.upload(
-              resume.tempFilePath,
-              { folder: "Job_Seekers_Resume" }
+      const { resume } = req.files;
+      if (resume) {
+        try {
+          const cloudinaryResponse = await cloudinary.uploader.upload(
+            resume.tempFilePath,
+            { folder: "Job_Seekers_Resume" }
+          );
+          if (!cloudinaryResponse || cloudinaryResponse.error) {
+            return next(
+              new ErrorHandler("Failed to upload resume to cloud.", 500)
             );
-            if (!cloudinaryResponse || cloudinaryResponse.error) {
-              return next(
-                new ErrorHandler("Failed to upload resume to cloud.", 500)
-              );
-            }
-            userData.resume = {
-              public_id: cloudinaryResponse.public_id,
-              url: cloudinaryResponse.secure_url,
-            };
-          } catch (error) {
-            return next(new ErrorHandler("Failed to upload resume", 500));
           }
+          userData.resume = {
+            public_id: cloudinaryResponse.public_id,
+            url: cloudinaryResponse.secure_url,
+          };
+        } catch (error) {
+          return next(new ErrorHandler("Failed to upload resume", 500));
         }
       }
-
+    }
     const user = await User.create(userData);
-    sendToken(user, 201, res, "User Registered")
-    
+    sendToken(user, 201, res, "User Registered.");
   } catch (error) {
-    return next(error);
+    next(error);
   }
 });
 
-export const login = catchAsyncErrors(async(req, res, next)=>{
-  const {role, email, password} = req.body;
-  if(!role || !email || !password){
+export const login = catchAsyncErrors(async (req, res, next) => {
+  const { role, email, password } = req.body;
+  if (!role || !email || !password) {
     return next(
-      new ErrorHandler("Email, Password and role are required",400)
+      new ErrorHandler("Email, password and role are required.", 400)
     );
   }
-
-  const user = await User.findOne({email}).select("+password");
-  if(!user){
-    return next(new ErrorHandler("Invalid email or password.",400))
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return next(new ErrorHandler("Invalid email or password.", 400));
   }
-
   const isPasswordMatched = await user.comparePassword(password);
-  if(!isPasswordMatched){
-    return next(new ErrorHandler("Invalid email or password",400))
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid email or password.", 400));
   }
-  if(user.role !== role){
-    return next(new ErrorHandler("Invalid user role.",400))
+  if (user.role !== role) {
+    return next(new ErrorHandler("Invalid user role.", 400));
   }
-  sendToken(user,200,res,"User logged in sucessfully");
-})
+  sendToken(user, 200, res, "User logged in successfully.");
+});
 
 export const logout = catchAsyncErrors(async (req, res, next) => {
   res
@@ -127,14 +108,13 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-export const getUser = catchAsyncErrors(async(req,res,next)=>{
+export const getUser = catchAsyncErrors(async (req, res, next) => {
   const user = req.user;
   res.status(200).json({
     success: true,
     user,
   });
 });
-
 
 export const updateProfile = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {
