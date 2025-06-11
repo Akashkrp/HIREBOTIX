@@ -84,7 +84,7 @@ export const fetchEmployerApplications = () => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForAllApplications());
   try {
     const response = await axios.get(
-      `https://hirebotix.onrender.com/api/v1/job/getall?/api/v1/application/employer/getall`,
+      `https://hirebotix.onrender.com/v1/application/employer/getall`,
       {
         withCredentials: true,
       }
